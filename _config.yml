@@ -4,3 +4,7 @@ description: "A brief description of your site"
 url: "https://yourusername.github.io"
 baseurl: ""  # サブディレクトリに配置する場合は、そのパスを設定
 theme: "minima"  # GitHub Pagesのデフォルトテーマ
+sitemap:
+    path: sitemap.xml
+    template: ./sitemap_template.xml
+    rel: false
