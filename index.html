@@ -2,135 +2,270 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="robots" content="index, follow">
-    <title>最寄り駅検索</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勉強用タイマー</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
             padding: 0;
-            background-color: #f7f7f7;
-            color: #333;
-        }
-
-        h1 {
-            font-size: 2em;
-            text-align: center;
-            margin: 30px 0;
-            color: #4CAF50;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        .container button {
-            padding: 12px 20px;
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 1.2em;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            box-sizing: border-box;
             transition: background-color 0.3s ease;
         }
 
-        .container button:hover {
-            background-color: #45a049;
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .container .result {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #fafafa;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            display: none;
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 24px;
         }
 
-        .container .error {
+        .timer-controls {
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 5px;
+        }
+
+        button:disabled {
+            background-color: #aaa;
+        }
+
+        select, input {
+            padding: 8px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        #time-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .countdown-options {
             margin-top: 20px;
-            padding: 20px;
-            background-color: #f8d7da;
-            border-radius: 8px;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-            display: none;
+        }
+
+        /* スライダーのスタイル */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            margin: 20px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            border-radius: 5px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .slider input {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 5px;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        .slider input:hover {
+            background: #45a049;
+        }
+
+        .slider-value {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* レスポンシブデザイン */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                max-width: 90%;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            button {
+                width: 100%;
+                padding: 12px;
+                font-size: 18px;
+            }
+
+            select, input {
+                width: 100%;
+                font-size: 18px;
+            }
+
+            #time-display {
+                font-size: 36px;
+            }
+
+            .slider-value {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>最寄り駅を検索</h1>
-
     <div class="container">
-        <button id="locationBtn">現在地から最寄り駅を取得</button>
+        <h1>勉強タイマー</h1>
+        <div class="timer-controls">
+            <button id="start-stop">開始</button>
+            <button id="reset">リセット</button>
+            <label for="mode">モード:</label>
+            <select id="mode">
+                <option value="countdown">カウントダウン</option>
+                <option value="countup">カウントアップ</option>
+            </select>
 
-        <div class="result" id="result"></div>
-        <div class="error" id="error"></div>
+            <!-- カウントダウン設定 -->
+            <div id="countdown-options" class="countdown-options">
+                <label for="countdown-time">時間設定:</label>
+                <div class="slider-container">
+                    <div class="slider">
+                        <input type="range" id="countdown-time" min="1" max="60" value="5" step="1">
+                    </div>
+                    <div class="slider-value" id="slider-value">5 分</div>
+                </div>
+            </div>
+        </div>
+        <div id="time-display" class="time-display">00:00</div>
     </div>
 
+    <!-- 音声ファイルを追加 -->
+    <audio id="alarm-sound" src="C:\Users\k\OneDrive\デスクトップ\Clock-Alarm01-1(Low-Loop).mp3" preload="auto"></audio>
+
     <script>
-        document.getElementById('locationBtn').addEventListener('click', function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    console.log('現在地の緯度:', lat, '経度:', lon); // 緯度・経度が取得できているか確認
+        let countdownTimer; // タイマーの名前を変更
+        let isRunning = false;
+        let totalTime = 0;
+        let remainingTime = 0;
+        let mode = "countdown";
 
-                    // HeartRails APIのURLを作成
-                    const url = `https://geoapi.heartrails.com/api/json?method=getStations&lat=${lat}&lng=${lon}`;
+        // 初期状態でカウントダウンモードにスライダーを表示
+        document.getElementById("countdown-options").style.display = "block";
 
-                    // APIリクエストを送信
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('APIレスポンス:', data); // レスポンス内容を確認
+        // ボタンのクリックイベント
+        document.getElementById("start-stop").addEventListener("click", startStop);
+        document.getElementById("reset").addEventListener("click", reset);
+        document.getElementById("mode").addEventListener("change", changeMode);
 
-                            const resultDiv = document.getElementById('result');
-                            const errorDiv = document.getElementById('error');
-                            resultDiv.style.display = 'none';
-                            errorDiv.style.display = 'none';
-
-                            // レスポンスが正しい形式かチェック
-                            if (data.response && data.response.station && data.response.station.length > 0) {
-                                const station = data.response.station[0];
-                                resultDiv.innerHTML = `<p><strong>最寄り駅:</strong> ${station.name}</p>
-                                                       <p><strong>路線名:</strong> ${station.line}</p>`;
-                                resultDiv.style.display = 'block';
-                            } else {
-                                showError("最寄り駅情報が見つかりませんでした。");
-                            }
-                        })
-                        .catch(error => {
-                            console.error('APIエラー:', error);
-                            showError("エラーが発生しました。再試行してください。");
-                        });
-                }, function(error) {
-                    console.error('位置情報取得エラー:', error);
-                    showError("現在地の取得に失敗しました: " + error.message);
-                });
-            } else {
-                showError("位置情報の取得がサポートされていません。");
-            }
+        // スライダーの値を反映
+        document.getElementById("countdown-time").addEventListener("input", function() {
+            document.getElementById("slider-value").textContent = `${this.value} 分`;
         });
 
-        // エラーメッセージを表示
-        function showError(message) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.innerHTML = `<p>${message}</p>`;
-            errorDiv.style.display = 'block';
+        function startStop() {
+            if (isRunning) {
+                clearInterval(countdownTimer); // 変数名を変更
+                document.getElementById("start-stop").textContent = "開始";
+            } else {
+                if (mode === "countdown") {
+                    remainingTime = parseInt(document.getElementById("countdown-time").value) * 60; // スライダー値を使用
+                    totalTime = remainingTime;
+                    updateTimeDisplay(remainingTime);
+                } else {
+                    remainingTime = 0;
+                }
+                countdownTimer = setInterval(updateTime, 1000); // 変数名を変更
+                document.getElementById("start-stop").textContent = "停止";
+            }
+            isRunning = !isRunning;
+        }
+
+        function reset() {
+            clearInterval(countdownTimer); // 変数名を変更
+            isRunning = false;
+            document.getElementById("start-stop").textContent = "開始";
+            document.getElementById("time-display").textContent = "00:00";
+            if (mode === "countdown") {
+                document.getElementById("countdown-time").value = 5; // デフォルトの時間にリセット
+                document.getElementById("slider-value").textContent = "5 分"; // スライダー値のリセット
+            }
+
+            // 背景色を元に戻す
+            document.body.style.backgroundColor = "#f5f5f5"; // 元の色に戻す
+        }
+
+        function updateTime() {
+            if (mode === "countdown") {
+                if (remainingTime > 0) {
+                    remainingTime--;
+                    updateTimeDisplay(remainingTime);
+                } else {
+                    clearInterval(countdownTimer); // 変数名を変更
+                    document.getElementById("start-stop").textContent = "開始";
+                    isRunning = false;
+
+                    // カウントダウン終了後に背景色を変更
+                    document.body.style.backgroundColor = "#ffcccc"; // 背景色を変える
+
+                    // 音を鳴らす
+                    document.getElementById("alarm-sound").play();
+                }
+            } else {
+                remainingTime++;
+                updateTimeDisplay(remainingTime);
+            }
+        }
+
+        // 時間表示の更新
+        function updateTimeDisplay(timeInSeconds) {
+            let minutes = Math.floor(timeInSeconds / 60);
+            let seconds = timeInSeconds % 60;
+            document.getElementById("time-display").textContent = `${formatTime(minutes)}:${formatTime(seconds)}`;
+        }
+
+        // 時間のフォーマット
+        function formatTime(time) {
+            return time < 10 ? `0${time}` : time;
+        }
+
+        function changeMode() {
+            mode = document.getElementById("mode").value;
+            if (mode === "countdown") {
+                document.getElementById("countdown-options").style.display = "block"; // スライダーを表示
+            } else {
+                document.getElementById("countdown-options").style.display = "block"; // スライダーは表示し続ける
+            }
         }
     </script>
-</body>
-</html>
-
 </body>
 </html>
